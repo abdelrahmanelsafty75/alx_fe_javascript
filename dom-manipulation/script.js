@@ -29,10 +29,24 @@ function addQuote() {
     const newCategory = inputQuoteCategory.value;
     
     if(newQuote && newCategory){
-        quotes.push({ text: newQuote, category: newCategory });
+        quoteObj = { text: newQuote, category: newCategory };
+        quotes.push(quoteObj);
+
         inputQuoteText.value = '';
         inputQuoteCategory.value = '';
-        showRandomQuote();
+
+        dsiplayDiv.innerHTML = '';
+         const qoutElementText = document.createElement('p');
+         qoutElementText.textContent = `"${quoteObj.text}"`;
+
+         const qoutElemtnCategory = document.createElement('p');
+         qoutElemtnCategory.textContent = `- ${quoteObj.category}`;
+
+        dsiplayDiv.appendChild(qoutElementText);
+        dsiplayDiv.appendChild(qoutElemtnCategory);
+    }
+    else{
+        alert("Please enter both quote text and category.");
     }
 }
 
