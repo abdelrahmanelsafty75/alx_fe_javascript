@@ -35,7 +35,7 @@ function addQuote() {
         inputQuoteText.value = '';
         inputQuoteCategory.value = '';
 
-        dsiplayDiv.innerHTML = '';
+        dsiplayDiv.innerHTML = ''; // to make the added quote visible immediately
          const qoutElementText = document.createElement('p');
          qoutElementText.textContent = `"${quoteObj.text}"`;
 
@@ -48,6 +48,29 @@ function addQuote() {
     else{
         alert("Please enter both quote text and category.");
     }
+}
+
+function createAddQuoteForm() {
+  const form = document.createElement('form')
+
+  const textInput = document.createElement('input');
+  textInput.id = 'newQuoteText';
+  textInput.placeholder = 'Enter a new quote';
+
+  const categoryInput = document.createElement('input');
+  categoryInput.id = 'newQuoteCategory';
+  categoryInput.placeholder = 'Enter quote category';
+
+  const addButton = document.createElement('button');
+  addButton.textContent = 'Add Quote';
+
+  addButton.addEventListener("click", addQuote);
+
+  form.appendChild(textInput);
+  form.appendChild(categoryInput);
+  form.appendChild(addButton);
+
+  document.body.appendChild(form);
 }
 
 showQuoteBtn.addEventListener('click', showRandomQuote);
