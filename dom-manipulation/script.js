@@ -24,4 +24,18 @@ function displayRandomQuote() {
     dsiplayDiv.appendChild(qoutElemtnCategory);
 }
 
+function addQuote() {
+    const newQuote = inputQuoteText.value;
+    const newCategory = inputQuoteCategory.value;
+    
+    if(newQuote && newCategory){
+        quotes.push({ text: newQuote, category: newCategory });
+        inputQuoteText.value = '';
+        inputQuoteCategory.value = '';
+        displayRandomQuote();
+    }
+}
 
+showQuoteBtn.addEventListener('click', displayRandomQuote);
+
+displayRandomQuote();
