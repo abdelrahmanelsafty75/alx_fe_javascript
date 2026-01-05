@@ -3,12 +3,15 @@ const showQuoteBtn = document.getElementById('newQuote');
 const inputQuoteText = document.getElementById('newQuoteText');
 const inputQuoteCategory = document.getElementById('newQuoteCategory');
 
-let quotes = [
+let quotes = JSON.parse(localStorage.getItem('quotes')) ||
+        [
             { text: "The only limit to our realization of tomorrow is our doubts of today.", category: "Inspiration" },
             { text: "Do what you can, with what you have, where you are.", category: "Motivation" },
             { text: "Code is like humor. When you have to explain it, it’s bad.", category: "Programming" }
         ];
-
+function saveQuotes(){
+    localStorage.setItem('quotes', JSON.stringify(quotes));
+}
 function showRandomQuote() {
     dsiplayDiv.innerHTML = '';
     const randomIndex = Math.floor(Math.random() * quotes.length);
@@ -31,6 +34,8 @@ function addQuote() {
     if(newQuote && newCategory){
         quoteObj = { text: newQuote, category: newCategory };
         quotes.push(quoteObj);
+
+        saveQuotes();
 
         inputQuoteText.value = '';
         inputQuoteCategory.value = '';
@@ -72,6 +77,34 @@ function createAddQuoteForm() {
 
   document.body.appendChild(form);
 }
+function exportToJsonFile() {
+    const dataStr = JSON.stringify(quotes);
+
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'quotes.json'; // The file name
+    document.body.appendChild(link);
+    link.click();
+
+    document.body.removeChild(link);
+}
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+
+    fileReader.onload = function(event) {
+        const importedQuotes = JSON.parse(event.target.result);
+
+        quotes.push(...importedQuotes); 
+        saveQuotes();
+
+        alert('Quotes imported successfully!');
+    };
+    fileReader.readAsText(event.target.files[0]);
+}
+
 
 showQuoteBtn.addEventListener('click', showRandomQuote);
 showRandomQuote();
