@@ -50,6 +50,7 @@ function addQuote() {
 
         saveQuotes();
         populateCategories();
+        postQuoteToServer(newQuote);
         
         inputQuoteText.value = '';
         inputQuoteCategory.value = '';
@@ -145,5 +146,79 @@ function filterQuotes() {
     showRandomQuote();
 }
 
+// Configuration
+const API_URL = "https://jsonplaceholder.typicode.com/posts"; // The mock server
+
+// Function to Simulate Fetching Data from Server
+async function fetchQuotesFromServer() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        return data.slice(0, 5).map(item => ({
+            text: item.title,
+            category: "Server"
+        }));
+    } catch (error) {
+        console.error("Error fetching from server:", error);
+        return []; 
+    }
+}
+async function postQuoteToServer(quote) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quote)
+        });
+        const result = await response.json();
+        console.log("Quote posted to server:", result);
+    } catch (error) {
+        console.error("Error posting to server:", error);
+    }
+}
+
+async function syncQuotes() {
+    const statusDiv = document.getElementById('syncStatus');
+
+    const serverQuotes = await fetchQuotesFromServer();
+    let conflictsResolved = false;
+    let newQuotesAdded = false;
+
+    serverQuotes.forEach(serverQuote => {
+        const localQuoteIndex = quotes.findIndex(q => q.text === serverQuote.text);
+
+        if (localQuoteIndex !== -1) {
+            if (quotes[localQuoteIndex].category !== serverQuote.category) {
+
+                quotes[localQuoteIndex].category = serverQuote.category;
+                conflictsResolved = true;
+            }
+        } else {
+            quotes.push(serverQuote);
+            newQuotesAdded = true;
+        }
+    });
+    if (conflictsResolved || newQuotesAdded) {
+        saveQuotes();
+        populateCategories(); 
+        
+        statusDiv.style.color = "#155724";
+        
+        if (conflictsResolved) {
+            statusDiv.textContent = "Sync complete. Conflicts resolved (Server data prioritized).";
+        } else {
+            statusDiv.textContent = "Sync complete. New quotes added from server.";
+        }
+        
+        showRandomQuote();
+    } else {
+        statusDiv.textContent = "Quotes synced. No changes.";
+        setTimeout(() => { statusDiv.style.display = 'none'; }, 3000);
+    }
+}
+setInterval(syncQuotes, 5000);
 showQuoteBtn.addEventListener('click', showRandomQuote);
 showRandomQuote();
